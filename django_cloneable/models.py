@@ -1,6 +1,8 @@
 # encoding: utf-8
 from django.db import models
-from django.db.models.fields import FieldDoesNotExist
+
+
+__all__ = ('CloneableMixin',)
 
 
 # Based on http://djangosnippets.org/snippets/1271/
