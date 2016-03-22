@@ -60,3 +60,14 @@ saved. By default the clone will be saved to the database, so that it has
 There are numerous hooks on how you can modify the cloning logic. The best way
 to learn about them is to have a look at the implementation of
 ``CloneableMixin``.
+
+Development
+-----------
+
+Install the dependencies (including the test dependencies) with::
+
+    pip install -r requirements.txt
+
+Then you can run all tests with::
+
+    tox
