@@ -1,0 +1,16 @@
+language: python
+python: 2.7
+sudo: false
+cache:
+- pip
+env:
+- TOXENV=py27-18
+- TOXENV=py27-19
+- TOXENV=py35-18
+- TOXENV=py35-19
+- TOXENV=pypy-18
+- TOXENV=pypy-19
+install:
+- pip install tox
+script:
+- tox
