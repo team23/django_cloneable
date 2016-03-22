@@ -6,7 +6,7 @@ django-cloneable
 .. |build-status| image:: https://travis-ci.org/team23/django_cloneable.svg
     :target: https://travis-ci.org/team23/django_cloneable
 
-.. |pypi-badge| image:: https://img.shields.io/pypi/v/django-admin-cloneable.svg
+.. |pypi-badge| image:: https://img.shields.io/pypi/v/django-cloneable.svg
     :target: https://pypi.python.org/pypi/django-cloneable
 
 **django-cloneable** provides a ``CloneableMixin`` class that has a ``clone()``
