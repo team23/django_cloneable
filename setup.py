@@ -28,7 +28,7 @@ setup(
     packages=find_packages(
         exclude=['tests', 'tests.*']),
     include_package_data=True,
-    url='https://git.team23.de/team23/django_cloneable',
+    url='https://github.com/team23/django_cloneable',
     license='BSD licence, see LICENSE file',
     description=(
         "Let's you clone a Django model instance including "
