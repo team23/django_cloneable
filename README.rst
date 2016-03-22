@@ -45,10 +45,10 @@ An example:
     assert diabolo.ingredients.all() == [tomatos, cheese, chili]
 
 As shown in the example, you can provide the ``attrs`` that shall be replaced
-in the cloned object. That let's you change the cloned instance before it gets
+in the cloned object. That lets you change the cloned instance before it gets
 saved. By default the clone will be saved to the database, so that it has
 ``pk`` when it gets returned.
 
-There are numerous hooks on how you can modify the cloning logic. The best was
+There are numerous hooks on how you can modify the cloning logic. The best way
 to learn about them is to have a look at the implementation of
 ``CloneableMixin``.
