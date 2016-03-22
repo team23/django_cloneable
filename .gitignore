@@ -3,3 +3,4 @@
 /.tox/
 /tests/db.sqlite
 /.cache/
+/.coverage
