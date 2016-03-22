@@ -1,4 +1,5 @@
 *.pyc
+/dist/
 /*.egg-info/
 /.tox/
 /tests/db.sqlite
