@@ -6,6 +6,7 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 
 DATABASES = {
     'default': {
+        'NAME': os.path.join(test_dir, 'db.sqlite'),
         'ENGINE': 'django.db.backends.sqlite3',
     },
 }
