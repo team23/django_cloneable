@@ -14,3 +14,9 @@ install:
 - pip install tox
 script:
 - tox
+deploy:
+  provider: pypi
+  on:
+    tags: true
+    repo: team23/django_cloneable
+    condition: "$TOXENV = py27-18"
