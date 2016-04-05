@@ -17,6 +17,9 @@ script:
 - tox
 deploy:
   provider: pypi
+  user: ddanier
+  password:
+    secure: LSWtthKrHSi27TgnOvt48JVya+PCIqH7jhuN5g6TYs9NTevSH9Y2fm3kdAAYx5cdB1sRDlMt6zCkk8LMk4/jx2QIQLNn8fvC5z8QNrH83lMYaZeaJZQwMmzcm0e4PtJJvDd4jax7xmMsqKSGykDp/TWNXrAo6d6vP2vdfMgANpgcq0KN7IuSAczxoPWPmM1HeaFvLWILsi00m+ZVaOOR0qf0kgHcXh9qlSjnq1H8T3LwqoUc3jUB7crLh1uePNO8934+Ep8QKhwJAI7gN0wdCXo/mf0S6qgkVMFnLqdMOiLLhY6Lsk/xQykDLTBzLtS00bvsAPR+0BsVxc/3io1Pi6v1Ls44gAOLfHTGJHsybZ+tIv/juO9HBLpn+Fy+8UChomrS+Ya0WJKULK+++C7g4WATKDnDTXn/qTl/w+ELEt2lZylU6kkxY3/wnWGoRrnM/j/zIs7y+y4Rak8Dp6Jz1+YZ5bKbs0Z6payuomjTxp8SfhV9Ek/ngYrLy0ZwzjldVifSX+6K3WxRcbpwkopHlyPjSnPoQmHDUVgraRfKoSBUoSxVc9uVlmwDAjbNLW6ie9Jg2Q/tyoLF4RV385aaI8P1t7UOZjnFGE4UzgBBSmxZCB4LDxQjf2G/WEdLLYOEcQLQC2joAXtSnZym2iL2FKwHZeuirApa3kkiUnaMclA=
   on:
     tags: true
     repo: team23/django_cloneable
