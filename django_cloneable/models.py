@@ -49,7 +49,7 @@ class ModelCloneHelper(object):
         it possible to exclude fields from cloning.
         """
         if attrs:
-            for attname, value in attrs.iteritems():
+            for attname, value in attrs.items():
                 setattr(duplicate, attname, value)
 
     def _clone_copy_m2m(self, duplicate, exclude=None):
