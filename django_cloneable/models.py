@@ -85,7 +85,10 @@ class ModelCloneHelper(object):
 
     def _clone_copy_reverse_m2m(self, duplicate, exclude=None):
         exclude = exclude or []
-        qs = self.instance._meta.get_all_related_many_to_many_objects()
+        qs = [
+            f for f in self.instance._meta.get_fields(include_hidden=True)
+            if f.many_to_many and f.auto_created
+        ]
         for relation in qs:
             # handle m2m using through
             if (
