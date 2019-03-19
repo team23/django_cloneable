@@ -172,6 +172,7 @@ class ModelCloneHelper(object):
             duplicate.clone_m2m = clone_m2m
         return duplicate
 
+
 def _get_remote_field(field):
     if hasattr(field, 'remote_field'):
         # Django 2
@@ -180,6 +181,7 @@ def _get_remote_field(field):
         # Django <= 1.11
         return field.rel
     return None
+
 
 class CloneableMixin(models.Model):
     ''' Adds a clone() method to models
