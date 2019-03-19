@@ -60,17 +60,18 @@ class ModelCloneHelper(object):
             if field.name in exclude:
                 continue
             # handle m2m using through
-            if field.rel.through and not field.rel.through._meta.auto_created:
+            remote_field = _get_remote_field(field)
+            if remote_field.through and not remote_field.through._meta.auto_created:
                 # through-model must be cloneable
-                if hasattr(field.rel.through, 'clone'):
-                    qs = field.rel.through._default_manager.filter(
+                if hasattr(remote_field.through, 'clone'):
+                    qs = remote_field.through._default_manager.filter(
                         **{field.m2m_field_name(): self.instance})
                     for m2m_obj in qs:
                         m2m_obj.clone(attrs={
                             field.m2m_field_name(): duplicate
                         })
                 else:
-                    qs = field.rel.through._default_manager.filter(
+                    qs = remote_field.through._default_manager.filter(
                         **{field.m2m_field_name(): self.instance})
                     for m2m_obj in qs:
                         # TODO: Allow switching to different helper?
@@ -91,16 +92,17 @@ class ModelCloneHelper(object):
         ]
         for relation in qs:
             # handle m2m using through
+            remote_field = _get_remote_field(relation.field)
             if (
-                    relation.field.rel.through and
-                    not relation.field.rel.through._meta.auto_created):
+                    remote_field.through and
+                    not remote_field.through._meta.auto_created):
                 # Skip this field.
                 # TODO: Not sure if this is the right value to check for..
-                if relation.field.rel.related_name in exclude:
+                if remote_field.related_name in exclude:
                     continue
                 # through-model must be cloneable
-                if hasattr(relation.field.rel.through, 'clone'):
-                    qs = relation.field.rel.through._default_manager.filter(**{
+                if hasattr(remote_field.through, 'clone'):
+                    qs = remote_field.through._default_manager.filter(**{
                         relation.field.m2m_reverse_field_name(): self.instance
                     })
                     for m2m_obj in qs:
@@ -108,7 +110,7 @@ class ModelCloneHelper(object):
                             relation.field.m2m_reverse_field_name(): duplicate
                         })
                 else:
-                    qs = relation.field.rel.through._default_manager.filter(**{
+                    qs = remote_field.through._default_manager.filter(**{
                         relation.field.m2m_reverse_field_name(): self.instance
                     })
                     for m2m_obj in qs:
@@ -120,11 +122,11 @@ class ModelCloneHelper(object):
             # normal m2m, this is easy
             else:
                 # Skip this field.
-                if relation.field.rel.related_name in exclude:
+                if remote_field.related_name in exclude:
                     continue
                 objs_rel_manager = getattr(
                     self.instance,
-                    relation.field.rel.related_name)
+                    remote_field.related_name)
                 objs = objs_rel_manager.all()
                 setattr(duplicate, relation.field.rel.related_name, objs)
 
@@ -160,6 +162,14 @@ class ModelCloneHelper(object):
             duplicate.clone_m2m = clone_m2m
         return duplicate
 
+def _get_remote_field(field):
+    if hasattr(field, 'remote_field'):
+        # Django 2
+        return field.remote_field
+    elif hasattr(field, 'rel'):
+        # Django <= 1.11
+        return field.rel
+    return None
 
 class CloneableMixin(models.Model):
     ''' Adds a clone() method to models
