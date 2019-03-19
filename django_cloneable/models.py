@@ -82,7 +82,12 @@ class ModelCloneHelper(object):
             # normal m2m, this is easy
             else:
                 objs = getattr(self.instance, field.attname).all()
-                setattr(duplicate, field.attname, objs)
+                try:
+                    # Django <= 1.11
+                    setattr(duplicate, field.attname, objs)
+                except TypeError:
+                    # Django 2
+                    getattr(duplicate, field.name).set(objs)
 
     def _clone_copy_reverse_m2m(self, duplicate, exclude=None):
         exclude = exclude or []
@@ -128,7 +133,12 @@ class ModelCloneHelper(object):
                     self.instance,
                     remote_field.related_name)
                 objs = objs_rel_manager.all()
-                setattr(duplicate, relation.field.rel.related_name, objs)
+                try:
+                    # Django <= 1.11
+                    setattr(duplicate, remote_field.related_name, objs)
+                except TypeError:
+                    # Django 2
+                    getattr(duplicate, remote_field.related_name).set(objs)
 
     def clone(self, attrs=None, commit=True, m2m_clone_reverse=True,
               exclude=None):
