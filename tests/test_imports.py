@@ -1,6 +1,6 @@
 def test_imports():
     import django_cloneable  # noqa
-    from django_cloneable import CloneableMixin
+    from django_cloneable.models import CloneableMixin
 
     assert CloneableMixin is not None
 
