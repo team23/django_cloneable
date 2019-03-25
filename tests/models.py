@@ -1,7 +1,7 @@
 from datetime import date
 from django.db import models
 
-from django_cloneable import CloneableMixin
+from django_cloneable.models import CloneableMixin
 
 
 class ModelWithFields(CloneableMixin, models.Model):

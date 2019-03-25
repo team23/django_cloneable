@@ -49,7 +49,7 @@ class ModelCloneHelper(object):
         it possible to exclude fields from cloning.
         """
         if attrs:
-            for attname, value in attrs.iteritems():
+            for attname, value in attrs.items():
                 setattr(duplicate, attname, value)
 
     def _clone_copy_m2m(self, duplicate, exclude=None):
@@ -60,17 +60,18 @@ class ModelCloneHelper(object):
             if field.name in exclude:
                 continue
             # handle m2m using through
-            if field.rel.through and not field.rel.through._meta.auto_created:
+            remote_field = _get_remote_field(field)
+            if remote_field.through and not remote_field.through._meta.auto_created:
                 # through-model must be cloneable
-                if hasattr(field.rel.through, 'clone'):
-                    qs = field.rel.through._default_manager.filter(
+                if hasattr(remote_field.through, 'clone'):
+                    qs = remote_field.through._default_manager.filter(
                         **{field.m2m_field_name(): self.instance})
                     for m2m_obj in qs:
                         m2m_obj.clone(attrs={
                             field.m2m_field_name(): duplicate
                         })
                 else:
-                    qs = field.rel.through._default_manager.filter(
+                    qs = remote_field.through._default_manager.filter(
                         **{field.m2m_field_name(): self.instance})
                     for m2m_obj in qs:
                         # TODO: Allow switching to different helper?
@@ -81,23 +82,32 @@ class ModelCloneHelper(object):
             # normal m2m, this is easy
             else:
                 objs = getattr(self.instance, field.attname).all()
-                setattr(duplicate, field.attname, objs)
+                try:
+                    # Django <= 1.11
+                    setattr(duplicate, field.attname, objs)
+                except TypeError:
+                    # Django 2
+                    getattr(duplicate, field.name).set(objs)
 
     def _clone_copy_reverse_m2m(self, duplicate, exclude=None):
         exclude = exclude or []
-        qs = self.instance._meta.get_all_related_many_to_many_objects()
+        qs = [
+            f for f in self.instance._meta.get_fields(include_hidden=True)
+            if f.many_to_many and f.auto_created
+        ]
         for relation in qs:
             # handle m2m using through
+            remote_field = _get_remote_field(relation.field)
             if (
-                    relation.field.rel.through and
-                    not relation.field.rel.through._meta.auto_created):
+                    remote_field.through and
+                    not remote_field.through._meta.auto_created):
                 # Skip this field.
                 # TODO: Not sure if this is the right value to check for..
-                if relation.field.rel.related_name in exclude:
+                if remote_field.related_name in exclude:
                     continue
                 # through-model must be cloneable
-                if hasattr(relation.field.rel.through, 'clone'):
-                    qs = relation.field.rel.through._default_manager.filter(**{
+                if hasattr(remote_field.through, 'clone'):
+                    qs = remote_field.through._default_manager.filter(**{
                         relation.field.m2m_reverse_field_name(): self.instance
                     })
                     for m2m_obj in qs:
@@ -105,7 +115,7 @@ class ModelCloneHelper(object):
                             relation.field.m2m_reverse_field_name(): duplicate
                         })
                 else:
-                    qs = relation.field.rel.through._default_manager.filter(**{
+                    qs = remote_field.through._default_manager.filter(**{
                         relation.field.m2m_reverse_field_name(): self.instance
                     })
                     for m2m_obj in qs:
@@ -117,13 +127,18 @@ class ModelCloneHelper(object):
             # normal m2m, this is easy
             else:
                 # Skip this field.
-                if relation.field.rel.related_name in exclude:
+                if remote_field.related_name in exclude:
                     continue
                 objs_rel_manager = getattr(
                     self.instance,
-                    relation.field.rel.related_name)
+                    remote_field.related_name)
                 objs = objs_rel_manager.all()
-                setattr(duplicate, relation.field.rel.related_name, objs)
+                try:
+                    # Django <= 1.11
+                    setattr(duplicate, remote_field.related_name, objs)
+                except TypeError:
+                    # Django 2
+                    getattr(duplicate, remote_field.related_name).set(objs)
 
     def clone(self, attrs=None, commit=True, m2m_clone_reverse=True,
               exclude=None):
@@ -156,6 +171,16 @@ class ModelCloneHelper(object):
         else:
             duplicate.clone_m2m = clone_m2m
         return duplicate
+
+
+def _get_remote_field(field):
+    if hasattr(field, 'remote_field'):
+        # Django 2
+        return field.remote_field
+    elif hasattr(field, 'rel'):
+        # Django <= 1.11
+        return field.rel
+    return None
 
 
 class CloneableMixin(models.Model):
